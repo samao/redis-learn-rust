@@ -44,6 +44,10 @@ impl DbDropGuard {
     pub(crate) fn new() -> DbDropGuard {
         DbDropGuard { db: Db::new() }
     }
+
+    pub(crate) fn db(&self) -> Db {
+        self.db.clone()
+    }
 }
 
 impl Db {
