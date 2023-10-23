@@ -1,4 +1,4 @@
-mod clients;
+pub mod clients;
 pub use clients::{BlockingClient, BufferedClient, Client};
 
 pub const DEFAULT_PORT: u16 = 6379;
@@ -18,7 +18,7 @@ use parse::{Parse, ParseError};
 mod shutdown;
 use shutdown::Shutdown;
 
-mod server;
+pub mod server;
 
 mod cmd;
 pub use cmd::Command;
