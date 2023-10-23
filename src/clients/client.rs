@@ -3,7 +3,7 @@
  * @Author: idzeir
  * @Date: 2023-10-20 12:43:58
  * @Last Modified by: idzeir
- * @Last Modified time: 2023-10-20 12:49:31
+ * @Last Modified time: 2023-10-23 16:22:03
  */
 
 use std::io::{Error, ErrorKind};
@@ -35,7 +35,10 @@ pub struct Message {
 }
 
 impl Client {
-    pub async fn connect<T: ToSocketAddrs>(addr: T) -> crate::Result<Client> {
+    pub async fn connect<T>(addr: T) -> crate::Result<Client>
+    where
+        T: ToSocketAddrs,
+    {
         let socket = TcpStream::connect(addr).await?;
 
         let connection = Connection::new(socket);

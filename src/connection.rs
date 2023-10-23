@@ -13,7 +13,7 @@ use crate::frame::{self, Frame};
  * @Author: idzeir
  * @Date: 2023-10-20 14:47:51
  * @Last Modified by: idzeir
- * @Last Modified time: 2023-10-20 15:21:02
+ * @Last Modified time: 2023-10-23 16:18:27
  */
 #[derive(Debug)]
 pub struct Connection {
