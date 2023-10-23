@@ -7,16 +7,13 @@ mod connection;
 pub use connection::Connection;
 
 mod db;
-use db::{Db, DbDropGuard};
 
 mod frame;
 pub use frame::Frame;
 
 mod parse;
-use parse::{Parse, ParseError};
 
 mod shutdown;
-use shutdown::Shutdown;
 
 pub mod server;
 

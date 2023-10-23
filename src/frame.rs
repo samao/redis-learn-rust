@@ -223,13 +223,13 @@ impl From<&str> for Error {
 }
 
 impl From<FromUtf8Error> for Error {
-    fn from(value: FromUtf8Error) -> Self {
+    fn from(_value: FromUtf8Error) -> Self {
         "protocol error; invalid frame format".into()
     }
 }
 
 impl From<TryFromIntError> for Error {
-    fn from(value: TryFromIntError) -> Self {
+    fn from(_value: TryFromIntError) -> Self {
         "protocol error: invalid frame format".into()
     }
 }

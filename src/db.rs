@@ -128,7 +128,7 @@ impl Db {
             .map(|tx| tx.send(value).unwrap_or(0))
             .unwrap_or(0)
     }
-
+    #[allow(unused)]
     fn shutdown_purge_task(&self) {
         let mut state = self.shared.state.lock().unwrap();
         state.shutdown = true;
