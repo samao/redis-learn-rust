@@ -1,4 +1,6 @@
-use crate::Connection;
+use tracing::debug;
+
+use crate::{Connection, Frame};
 
 #[derive(Debug)]
 pub struct Unknown {
@@ -17,6 +19,10 @@ impl Unknown {
     }
 
     pub(crate) async fn apply(self, dst: &mut Connection) -> crate::Result<()> {
+        let response = Frame::Error(format!("ERR unknown command {}", self.command_name));
+
+        debug!(?response);
+        dst.write_frame(&response).await?;
         Ok(())
     }
 }

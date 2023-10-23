@@ -1,8 +1,9 @@
 use bytes::Bytes;
+use tracing::{debug, instrument};
 
 use crate::{
     parse::{Parse, ParseError},
-    Connection,
+    Connection, Frame,
 };
 
 #[derive(Debug, Default)]
@@ -23,7 +24,25 @@ impl Ping {
         }
     }
 
+    #[instrument(skip(self, dst))]
     pub(crate) async fn apply(self, dst: &mut Connection) -> crate::Result<()> {
+        let response = match self.msg {
+            None => Frame::Simple("PONG".to_string()),
+            Some(msg) => Frame::Bulk(msg),
+        };
+        debug!(?response);
+
+        dst.write_frame(&response).await?;
+
         Ok(())
+    }
+
+    pub(crate) fn into_frame(self) -> Frame {
+        let mut frame = Frame::array();
+        frame.push_bulk(Bytes::from("ping".as_bytes()));
+        if let Some(msg) = self.msg {
+            frame.push_bulk(msg);
+        }
+        frame
     }
 }

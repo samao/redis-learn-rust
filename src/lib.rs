@@ -1,4 +1,5 @@
 mod clients;
+pub use clients::{BlockingClient, BufferedClient, Client};
 
 pub const DEFAULT_PORT: u16 = 6379;
 

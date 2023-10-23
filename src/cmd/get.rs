@@ -1,4 +1,7 @@
-use crate::{db::Db, parse::Parse, Connection};
+use bytes::Bytes;
+use tracing::{debug, instrument};
+
+use crate::{db::Db, parse::Parse, Connection, Frame};
 
 #[derive(Debug)]
 pub struct Get {
@@ -21,7 +24,22 @@ impl Get {
         Ok(Get { key })
     }
 
+    #[instrument(skip(self, db, dst))]
     pub(crate) async fn apply(self, db: &Db, dst: &mut Connection) -> crate::Result<()> {
+        let response = if let Some(value) = db.get(&self.key) {
+            Frame::Bulk(value)
+        } else {
+            Frame::Null
+        };
+        debug!(?response);
+        dst.write_frame(&response).await?;
         Ok(())
+    }
+
+    pub(crate) fn into_frame(self) -> Frame {
+        let mut frame = Frame::array();
+        frame.push_bulk(Bytes::from("get".as_bytes()));
+        frame.push_bulk(Bytes::from(self.key.into_bytes()));
+        frame
     }
 }

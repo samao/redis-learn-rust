@@ -1,6 +1,6 @@
 use bytes::Bytes;
 
-use crate::{db::Db, parse::Parse, Connection};
+use crate::{db::Db, parse::Parse, Connection, Frame};
 
 #[derive(Debug)]
 pub struct Publish {
@@ -23,6 +23,19 @@ impl Publish {
     }
 
     pub(crate) async fn apply(self, db: &Db, dst: &mut Connection) -> crate::Result<()> {
+        let num_subscribers = db.publish(&self.channel, self.message);
+        let response = Frame::Integer(num_subscribers as u64);
+
+        dst.write_frame(&response).await?;
+
         Ok(())
+    }
+
+    pub(crate) fn into_frame(self) -> Frame {
+        let mut frame = Frame::array();
+        frame.push_bulk(Bytes::from("publish".as_bytes()));
+        frame.push_bulk(Bytes::from(self.channel.into_bytes()));
+        frame.push_bulk(self.message);
+        frame
     }
 }

@@ -1,11 +1,12 @@
 use std::time::Duration;
 
 use bytes::Bytes;
+use tracing::{debug, instrument};
 
 use crate::{
     db::Db,
     parse::{Parse, ParseError},
-    Connection,
+    Connection, Frame,
 };
 
 #[derive(Debug)]
@@ -61,7 +62,26 @@ impl Set {
         Ok(Self { key, value, expire })
     }
 
+    #[instrument(skip(self, db, dst))]
     pub(crate) async fn apply(self, db: &Db, dst: &mut Connection) -> crate::Result<()> {
+        db.set(self.key, self.value, self.expire);
+        let response = Frame::Simple("OK".to_string());
+        debug!(?response);
+        dst.write_frame(&response).await?;
+
         Ok(())
+    }
+
+    pub(crate) fn into_frame(self) -> Frame {
+        let mut frame = Frame::array();
+        frame.push_bulk(Bytes::from("set".as_bytes()));
+        frame.push_bulk(Bytes::from(self.key.into_bytes()));
+        frame.push_bulk(self.value);
+
+        if let Some(ms) = self.expire {
+            frame.push_bulk(Bytes::from("px".as_bytes()));
+            frame.push_int(ms.as_millis() as u64);
+        }
+        frame
     }
 }
