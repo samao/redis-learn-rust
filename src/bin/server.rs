@@ -8,6 +8,7 @@
 use clap::Parser;
 use mini_redis::{server, DEFAULT_PORT};
 use tokio::{net::TcpListener, signal};
+use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 #[cfg(feature = "otel")]
 // To be able to set the XrayPropagator
@@ -45,7 +46,9 @@ struct Cli {
 
 #[cfg(not(feature = "otel"))]
 fn set_up_logging() -> mini_redis::Result<()> {
-    tracing_subscriber::fmt::try_init()
+    tracing_subscriber::registry().with(fmt::layer()).init();
+    // tracing_subscriber::fmt::try_init()?;
+    Ok(())
 }
 
 #[cfg(feature = "otel")]

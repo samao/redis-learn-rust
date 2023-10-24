@@ -1,0 +1,3 @@
+fn say() {
+    println!("GUUD");
+}
